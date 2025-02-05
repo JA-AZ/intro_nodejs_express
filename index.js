@@ -5,6 +5,16 @@ const port = 3000;
 //Serve static files form the "Public" folder
 app.use(express.static('public'));
 
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+})
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
+
 //Define a rout for the home page
 app.get('/', (req, res) => {
     res.send('Hello, World!');
@@ -26,7 +36,14 @@ app.post('/submit', (req, res) => {
     res.send(`Received: ${JSON.stringify(data)}`);
 })
 
-app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
-    next();
-})
+const items = ['Apple', 'Banana', 'Orange'];
+
+app.get('/items', (req, res) => {
+    res.json(items);
+});
+
+app.post('/items', (req, res) => {
+    const newItem = req.body.item;
+    items.push(newItem);
+    res.json(items);
+});
